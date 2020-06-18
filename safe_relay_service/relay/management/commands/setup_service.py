@@ -26,12 +26,13 @@ class CeleryTaskConfiguration(NamedTuple):
 
 class Command(BaseCommand):
     help = 'Setup service required tasks'
-    tasks = [CeleryTaskConfiguration('safe_relay_service.relay.tasks.deploy_safes_task',
-                                     'Deploy Safes', 20, IntervalSchedule.SECONDS),
+    tasks = [
+             # CeleryTaskConfiguration('safe_relay_service.relay.tasks.deploy_safes_task',
+             #                         'Deploy Safes', 20, IntervalSchedule.SECONDS),
              CeleryTaskConfiguration('safe_relay_service.relay.tasks.check_balance_of_accounts_task',
-                                     'Check Balance of realy accounts', 1, IntervalSchedule.HOURS),
-             CeleryTaskConfiguration('safe_relay_service.relay.tasks.check_create2_deployed_safes_task',
-                                     'Check and deploy Create2 Safes', 1, IntervalSchedule.MINUTES),
+                                     'Check Balance of relay accounts', 1, IntervalSchedule.HOURS),
+             # CeleryTaskConfiguration('safe_relay_service.relay.tasks.check_create2_deployed_safes_task',
+             #                         'Check and deploy Create2 Safes', 1, IntervalSchedule.MINUTES),
              CeleryTaskConfiguration('safe_relay_service.relay.tasks.find_erc_20_721_transfers_task',
                                      'Process ERC20/721 transfers for Safes', 2, IntervalSchedule.MINUTES),
              CeleryTaskConfiguration('safe_relay_service.relay.tasks.check_pending_transactions',
