@@ -174,7 +174,7 @@ class TransactionService:
 
         minimum_accepted_gas_price = self._get_minimum_gas_price()
         if gas_token and gas_token != NULL_ADDRESS:
-            estimated_gas_price = CirclesService(self.ethereum_client).estimated_gas_price()
+            estimated_gas_price = self._estimate_tx_gas_price(gas_token)
             if safe_gas_price < estimated_gas_price:
                 raise GasPriceTooLow('Required gas-price>=%d to use gas-token' % estimated_gas_price)
         else:
@@ -213,6 +213,31 @@ class TransactionService:
             return last_used_nonce
         except BadFunctionCallOutput:  # If Safe does not exist
             raise SafeDoesNotExist(f'Safe={safe_address} does not exist')
+
+    def estimate_circles_signup_tx(self, safe_address: str, gas_token: str = NULL_ADDRESS) -> int:
+        """
+        Estimates gas costs of Circles token deployment method
+        :param safe_address:
+        :param gas_token:
+        """
+        value = 0
+        operation = 0
+        # Tx data from Circles Token contract signup method
+        data = ("0x519c6377000000000000000000000000000000000000000000000"
+                "0000000000000000020000000000000000000000000000000000000"
+                "0000000000000000000000000007436972636c65730000000000000"
+                "0000000000000000000000000000000000000")
+        transaction_estimation = self.estimate_tx(
+            safe_address,
+            settings.CIRCLES_HUB_ADDRESS,
+            value,
+            data,
+            operation,
+            gas_token
+        )
+        return (
+            transaction_estimation.safe_tx_gas + transaction_estimation.base_gas
+        ) * transaction_estimation.gas_price
 
     def estimate_tx(self, safe_address: str, to: str, value: int, data: str, operation: int,
                     gas_token: Optional[str]) -> TransactionEstimationWithNonce:

@@ -479,12 +479,14 @@ def circles_onboarding_token_task(safe_address: str) -> None:
         lock_name = f'locks:circles_onboarding_token_task:{safe_address}'
         with redis.lock(lock_name, blocking_timeout=1, timeout=LOCK_TIMEOUT):
             ethereum_client = EthereumClientProvider()
+            transaction_service = TransactionServiceProvider()
+
             # @TODO: Do nothing if Token is already deployed
             # if CirclesService(ethereum_client).is_token_deployed(safe=safe_address):
             #     return
 
             # Do nothing if the Token is already funded
-            token_deployment_cost = CirclesService(ethereum_client).estimate_signup_gas(safe_address)
+            token_deployment_cost = transaction_service.estimate_circles_signup_tx(safe_address)
             if ethereum_client.get_balance(safe_address) >= token_deployment_cost:
                 return
 
