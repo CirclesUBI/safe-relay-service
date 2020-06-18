@@ -341,7 +341,8 @@ def check_create2_deployed_safes_task() -> None:
                         # start task to fund token deployment
                         fund_token_deployment.delay(safe_address)
                 else:
-                    # If safe was not included in any block after 35 minutes (mempool limit is 30), we try to deploy it again
+                    # If safe was not included in any block after 35 minutes
+                    # (mempool limit is 30), we try to deploy it again
                     if safe_creation2.modified + timedelta(minutes=35) < timezone.now():
                         logger.info('Safe=%s with tx-hash=%s was not deployed after 10 minutes',
                                     safe_address, safe_creation2.tx_hash)
@@ -470,7 +471,8 @@ def circles_onboarding_safe_task(safe_address: str) -> None:
             except SafeCreation2.DoesNotExist:
                 pass
             except NotEnoughFundingForCreation:
-                logger.info('Safe does not have enough fund for deployment, check trust connections {}'.format(safe_address))
+                logger.info('Safe does not have enough fund for deployment,'
+                            'check trust connections {}'.format(safe_address))
                 # If we have enough trust connections, fund safe
                 if GraphQLService().check_trust_connections(safe_address):
                     logger.info('Fund Safe deployment for {}'.format(safe_address))
@@ -521,4 +523,5 @@ def circles_onboarding_token_task(safe_address: str) -> None:
                 gas=24000,
                 retry=True
             )
-    except LockError
+    except LockError:
+        pass
