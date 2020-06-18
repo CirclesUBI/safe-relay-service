@@ -61,6 +61,7 @@ DJANGO_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     # 'django.contrib.humanize', # Handy template tags
 
 ]
@@ -81,6 +82,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -209,6 +211,10 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'safe_relay_service.relay.views.custom_exception_handler',
 }
 
+# Django CORS
+# ------------------------------------------------------------------------------
+CORS_ORIGIN_ALLOW_ALL = True
+
 # LOGGING
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
@@ -330,3 +336,12 @@ TOKEN_LOGO_EXTENSION = env('TOKEN_LOGO_EXTENSION', default='.png')
 
 # Notifications
 SLACK_API_WEBHOOK = env('SLACK_API_WEBHOOK', default=None)
+
+# Circles
+# ------------------------------------------------------------------------------
+CIRCLES_HUB_ADDRESS = env('CIRCLES_HUB_ADDRESS', default='0x' + '0' * 39 + '1')
+
+GRAPH_NODE_EXTERNAL = env('GRAPH_NODE_EXTERNAL', default='')
+SUBGRAPH_NAME = env('SUBGRAPH_NAME', default='')
+
+MIN_TRUST_CONNECTIONS = env('MIN_TRUST_CONNECTIONS', default=3)

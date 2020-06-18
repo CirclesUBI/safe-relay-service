@@ -21,6 +21,7 @@ from safe_relay_service.gas_station.gas_station import (GasStation,
                                                         GasStationProvider)
 from safe_relay_service.tokens.models import Token
 from safe_relay_service.tokens.price_oracles import CannotGetTokenPriceFromApi
+from safe_relay_service.relay.services.circles_service import CirclesService
 
 from ..models import EthereumBlock, EthereumTx, SafeContract, SafeMultisigTx
 from ..repositories.redis_repository import EthereumNonceLock, RedisRepository
@@ -150,8 +151,9 @@ class TransactionService:
         if address == NULL_ADDRESS:
             return True
         try:
-            Token.objects.get(address=address, gas=True)
-            return True
+            # @TODO: Fetch valid Tokens from database instead
+            ethereum_client = EthereumClientProvider()
+            return CirclesService(ethereum_client).is_circles_token(address)
         except Token.DoesNotExist:
             logger.warning('Cannot retrieve gas token from db: Gas token %s not valid', address)
             return False
@@ -172,16 +174,9 @@ class TransactionService:
 
         minimum_accepted_gas_price = self._get_minimum_gas_price()
         if gas_token and gas_token != NULL_ADDRESS:
-            try:
-                gas_token_model = Token.objects.get(address=gas_token, gas=True)
-                estimated_gas_price = gas_token_model.calculate_gas_price(minimum_accepted_gas_price)
-                if safe_gas_price < estimated_gas_price:
-                    raise GasPriceTooLow('Required gas-price>=%d to use gas-token' % estimated_gas_price)
-                # We use gas station tx gas price. We cannot use internal tx's because is calculated
-                # based on the gas token
-            except Token.DoesNotExist:
-                logger.warning('Cannot retrieve gas token from db: Gas token %s not valid', gas_token)
-                raise InvalidGasToken('Gas token %s not valid' % gas_token)
+            estimated_gas_price = CirclesService(self.ethereum_client).estimated_gas_price()
+            if safe_gas_price < estimated_gas_price:
+                raise GasPriceTooLow('Required gas-price>=%d to use gas-token' % estimated_gas_price)
         else:
             if safe_gas_price < minimum_accepted_gas_price:
                 raise GasPriceTooLow('Required gas-price>=%d' % minimum_accepted_gas_price)
@@ -190,11 +185,7 @@ class TransactionService:
     def _estimate_tx_gas_price(self, gas_token: Optional[str] = None):
         gas_price_fast = self._get_configured_gas_price()
         if gas_token and gas_token != NULL_ADDRESS:
-            try:
-                gas_token_model = Token.objects.get(address=gas_token, gas=True)
-                return gas_token_model.calculate_gas_price(gas_price_fast)
-            except Token.DoesNotExist:
-                raise InvalidGasToken('Gas token %s not found' % gas_token)
+            return CirclesService(self.ethereum_client).estimated_gas_price()
         else:
             return gas_price_fast
 
@@ -382,6 +373,10 @@ class TransactionService:
         # Make sure refund receiver is set to 0x0 so that the contract refunds the gas costs to tx.origin
         if not self._check_refund_receiver(refund_receiver):
             raise InvalidRefundReceiver(refund_receiver)
+
+        # Make sure we only pay gas fees with Circles Tokens
+        if not self._is_valid_gas_token(gas_token):
+            raise InvalidGasToken(gas_token)
 
         self._check_safe_gas_price(gas_token, gas_price)
 
