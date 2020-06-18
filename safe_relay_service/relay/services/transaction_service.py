@@ -2,6 +2,7 @@ from datetime import timedelta
 from logging import getLogger
 from typing import Any, Dict, List, NamedTuple, Optional, Set, Tuple
 
+from django.conf import settings
 from django.db import IntegrityError
 from django.db.models import Q
 from django.utils import timezone
