@@ -23,7 +23,7 @@ from .serializers import (SafeCreation2ResponseSerializer,
                           SafeMultisigEstimateTxResponseSerializer,
                           SafeMultisigEstimateTxResponseV2Serializer)
 from .services.safe_creation_service import SafeCreationServiceProvider
-from .tasks import circles_onoboarding
+from .tasks import begin_circles_onboarding_task
 
 logger = getLogger(__name__)
 
@@ -158,5 +158,6 @@ class SafeSignalView(APIView):
             except SafeCreation2.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-            circles_onoboarding.delay(address)
+            # Manually start custom Circles onboarding task
+            begin_circles_onboarding_task.delay(address)
             return Response(status=status.HTTP_202_ACCEPTED)
