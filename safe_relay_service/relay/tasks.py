@@ -451,7 +451,7 @@ def circles_onboarding_safe_task(safe_address: str) -> None:
         with redis.lock(lock_name, blocking_timeout=1, timeout=LOCK_TIMEOUT):
             logger.info('Check deploying Safe .. {}'.format(safe_address))
             try:
-                SafeCreationServiceProvider().deploy_create2_safe_tx(safe_address, retry=True)
+                SafeCreationServiceProvider().deploy_create2_safe_tx(safe_address)
             except SafeCreation2.DoesNotExist:
                 pass
             except NotEnoughFundingForCreation:
