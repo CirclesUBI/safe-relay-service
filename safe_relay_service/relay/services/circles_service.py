@@ -5,7 +5,7 @@ from ethereum.utils import check_checksum
 from gnosis.eth import EthereumClient
 from gnosis.eth.constants import NULL_ADDRESS
 
-from .transaction_service import TransactionServiceProvider
+from . import TransactionServiceProvider
 
 
 class CirclesService:
