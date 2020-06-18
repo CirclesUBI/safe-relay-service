@@ -521,3 +521,4 @@ def circles_onboarding_token_task(safe_address: str) -> None:
                 gas=24000,
                 retry=True
             )
+    except LockError
