@@ -181,7 +181,7 @@ class TransactionService:
     def _estimate_tx_gas_price(self, gas_token: Optional[str] = None):
         gas_price_fast = self._get_configured_gas_price()
         if gas_token and gas_token != NULL_ADDRESS:
-            return CirclesService(self.ethereum_client).estimated_gas_price()
+            return CirclesService(self.ethereum_client).gas_price()
         else:
             return gas_price_fast
 
