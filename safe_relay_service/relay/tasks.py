@@ -372,7 +372,7 @@ def find_erc_20_721_transfers_task() -> int:
     return number_safes
 
 
-@app.shared_task(bind=True, soft_time_limit=LOCK_TIMEOUT, max_retries=3)
+@app.shared_task(bind=True, soft_time_limit=LOCK_TIMEOUT, max_retries=6)
 def begin_circles_onboarding_task(self, safe_address: str) -> None:
     """
     Starts a multi-step onboarding task for Circles users which 1. funds
