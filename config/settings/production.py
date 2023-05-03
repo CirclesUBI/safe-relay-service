@@ -8,8 +8,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     "relayer-service",
     env("HOST_RELAYER", default="localhost"),
-    env("DJANGO_ALLOWED_HOSTS", default="circles.garden"),
+    env("DJANGO_ALLOWED_HOSTS", default=".circles.garden"),
 ]
+
 
 # DATABASES
 
@@ -57,7 +58,7 @@ INSTALLED_APPS += ["gunicorn"]
 
 # Django CORS
 
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+CORS_ALLOWED_ORIGIN_REGEXES = env.list("CORS_ALLOWED_ORIGIN_REGEXES", default=[r"^https:\/\/\w+\.circles\.garden$"])
 
 # SAFE
 
