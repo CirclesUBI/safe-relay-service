@@ -361,13 +361,14 @@ class SafeCreationService:
             self.funder_account.address,
             lock_timeout=60 * 2,
         ) as tx_nonce:
+            logger.error(f"Gas price: ***** {safe_creation2.gas_price_estimated + 10000000000}")
             ethereum_tx_sent = proxy_factory.deploy_proxy_contract_with_nonce(
                 self.funder_account,
                 safe_creation2.master_copy,
                 setup_data,
                 safe_creation2.salt_nonce,
                 gas=safe_creation2.gas_estimated + 50000,  # Just in case
-                gas_price=safe_creation2.gas_price_estimated+8,
+                gas_price=safe_creation2.gas_price_estimated + 1000000000000,
                 nonce=tx_nonce,
             )
             EthereumTx.objects.create_from_tx_dict(
